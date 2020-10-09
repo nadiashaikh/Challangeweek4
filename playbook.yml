@@ -1,0 +1,49 @@
+- hosts: all
+  connection: local
+  become: true
+  vars:
+      ansible_python_interpreter: "/usr/bin/python3"
+  tasks:
+    - name: Install aptitude using apt
+      apt: 
+      name: aptitude 
+      state: latest
+      update_cache: yes
+      force_apt_get: yes
+
+    - name: Add Docker GPG key 
+      apt_key:
+        url=https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+    - name: Install basic list of packages
+      apt:
+        name: ['apt-transport-https','ca-certificates','curl','software-properties-common']
+        state: latest
+        update_cache: yes
+        become: true
+
+    - name: Add Docker APT repository
+      apt_repository:
+        repo: deb [arch=amd64] https://downlode.docker.com/linux/ubuntu bionic stable
+      become: true
+
+    - name: Install Docker packages
+      apt:
+        name: ['docker-ce','docker-ce-cli','docker.io']
+        state: latest
+      become: true
+
+    - name: Install Docker Module for Python
+      pip:      
+        name: docker
+
+    - name: Install Docker-compose
+      shell: curl -L "https://github.com/docker/compose/releases/download/${version}/docker-compose-$(uname -s)-$(uname -m)"
+      ignore_errors: yes
+    
+    - name: Start the Docker service
+      service:
+         name: Docker service
+         state: started
+         
