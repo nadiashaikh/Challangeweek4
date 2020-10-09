@@ -1,1 +1,66 @@
+sudo apt-get install docker.io python3-docker -y
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo usermod -aG docker $USER
+mkdir docker_project
+cd docker_project 
+touch nano hosts
+[webserver]
+127.0.0.1
 
+[webserver:vars]
+ansible_python_interpreter: "/usr/bin/python3"
+
+touch playbook.yml
+- hosts: all
+  connection: local
+  become: true
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+tasks:
+ - name: Install aptitude using apt
+   apt: name=aptitude 
+   state=latest 
+   update_cache=yes 
+   force_apt_get=yes
+      
+ - name: Add Docker GPG key
+  apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+  become: true
+
+- name: Install basic list of packages
+  apt:
+    name: ['apt-transport-https','ca-certificates','curl','software-properties-common']
+    state: latest
+    update_cache: yes
+  become: true
+
+- name: Add Docker APT repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+  become: true
+
+- name: Install Docker packages
+  apt:
+    name: ['docker-ce','docker-ce-cli','containerd.io']
+    state: latest
+  become: true
+
+- name: Install Docker-compose
+  shell: curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+  become: true
+  
+- name: Install Docker Modile for Python
+  pip:
+    name: docker
+    
+- name: Start the Docker service
+  service:
+     name: Docker service
+     state: started
+  
+ansible-playbook -i '[127.0.0.1]' playbook.yaml
+
+
+  
+  
