@@ -61,6 +61,16 @@ tasks:
   
 ansible-playbook -i '[127.0.0.1]' playbook.yaml
 
+Git clone https://github.com/nadiashaikh/Challangeweek4.git
+cd Challangeweek4/
+mv ../ playbook.yml .
+git add .
+git commit -m "Added Added docker_project"
+git config --global user.email "nadia.shaikh@nationwide.co.uk"
+git config --global user.name "nadiashaikh"
+git commit -m "Added Added docker_project"
+git push -u origin main
+
 
   
   
